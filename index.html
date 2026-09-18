@@ -1,159 +1,192 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Conectar Perros</title>
-<style>
-  :root { color-scheme: light dark; }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: #FFF7ED;
-    color: #111827;
-  }
-  @media (prefers-color-scheme: dark) {
-    body { background: #1c1408; color: #F3F4F6; }
-    .card { background: #2a1d0f !important; }
-    .muted { color: #9CA3AF !important; }
-  }
-  .card {
-    width: 100%;
-    max-width: 380px;
-    background: #ffffff;
-    border-radius: 24px;
-    padding: 28px 24px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  }
-  .avatar {
-    width: 112px;
-    height: 112px;
-    border-radius: 999px;
-    object-fit: cover;
-    margin: 0 auto 16px;
-    background: #FFEDD5;
-    display: block;
-  }
-  .avatar-placeholder {
-    width: 112px;
-    height: 112px;
-    border-radius: 999px;
-    margin: 0 auto 16px;
-    background: #FFEDD5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-  }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  .muted { color: #6B7280; font-size: 14px; margin: 0 0 20px; }
-  .lead { font-size: 15px; line-height: 1.5; margin: 0 0 24px; }
-  .btn {
-    display: block;
-    width: 100%;
-    padding: 14px 20px;
-    border-radius: 16px;
-    background: #F97316;
-    color: white;
-    font-weight: 600;
-    font-size: 15px;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    margin-bottom: 12px;
-  }
-  .note {
-    font-size: 12px;
-    color: #9CA3AF;
-    line-height: 1.5;
-  }
-  .paw { font-size: 40px; margin-bottom: 8px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conectar Perros</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff7ed;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #111827;
+      padding: 24px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      max-width: 360px;
+      width: 100%;
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 60px;
+      object-fit: cover;
+      margin: 0 auto 16px;
+      display: block;
+      background: #f3f4f6;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0 0 4px;
+    }
+    .city {
+      color: #6b7280;
+      margin: 0 0 24px;
+      font-size: 14px;
+    }
+    .open-btn {
+      display: inline-block;
+      background: #f97316;
+      color: #ffffff;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+    }
+    .open-btn:active {
+      opacity: 0.85;
+    }
+    .fallback-message {
+      margin-top: 16px;
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      text-align: left;
+    }
+    .fallback-message[hidden] {
+      display: none;
+    }
+    .beta-notice {
+      margin-top: 12px;
+      color: #9ca3af;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .error,
+    .loading {
+      color: #6b7280;
+      font-size: 15px;
+    }
+  </style>
 </head>
 <body>
-  <div class="card" id="card">
-    <div class="paw">🐾</div>
-    <p class="muted">Cargando…</p>
+  <div class="card" id="app">
+    <p class="loading">Cargando…</p>
   </div>
 
   <script>
-    const SUPABASE_URL = "https://vkyvxmgxghywaktosaxe.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZreXZ4bWd4Z2h5d2FrdG9zYXhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MzM0NTEsImV4cCI6MjA5NjAwOTQ1MX0.oiZajHoqCMtHrEiquE5ye188mRj9J9tZsrPfQO_ri_I";
+    // Mismo proyecto/anon key que usa la app (src/lib/supabase.ts,
+    // app.json). El anon key es público por diseño (protegido por RLS),
+    // no es un secreto.
+    var SUPABASE_URL = "https://vkyvxmgxghywaktosaxe.supabase.co";
+    var SUPABASE_ANON_KEY =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZreXZ4bWd4Z2h5d2FrdG9zYXhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MzM0NTEsImV4cCI6MjA5NjAwOTQ1MX0.oiZajHoqCMtHrEiquE5ye188mRj9J9tZsrPfQO_ri_I";
 
-    function qs(name) {
-      return new URLSearchParams(window.location.search).get(name);
-    }
+    var params = new URLSearchParams(window.location.search);
+    var dogId = params.get("id");
+    var appEl = document.getElementById("app");
 
-    function escapeHtml(text) {
-      const div = document.createElement("div");
-      div.textContent = text;
+    function escapeHtml(value) {
+      var div = document.createElement("div");
+      div.textContent = value == null ? "" : String(value);
       return div.innerHTML;
     }
 
-    function renderCard(html) {
-      document.getElementById("card").innerHTML = html;
+    function renderError(message) {
+      appEl.innerHTML = '<p class="error">' + escapeHtml(message) + "</p>";
     }
 
-    function renderNotFound() {
-      renderCard(`
-        <div class="paw">🐾</div>
-        <h1>No encontramos este perro</h1>
-        <p class="lead">Este código QR no corresponde a ningún perro registrado en Conectar Perros, o el perfil ya no existe.</p>
-      `);
+    function render(card) {
+      var name = card.name || card.dog_name || "Este perrito";
+      var avatarUrl = card.avatar_url || card.dog_avatar_url || "";
+      var city = card.city || card.owner_city || "";
+      var deepLink = "conectarperros://dog/" + encodeURIComponent(dogId);
+
+      appEl.innerHTML =
+        (avatarUrl
+          ? '<img class="avatar" src="' + escapeHtml(avatarUrl) + '" alt="' + escapeHtml(name) + '" />'
+          : "") +
+        "<h1>" + escapeHtml(name) + "</h1>" +
+        (city ? '<p class="city">' + escapeHtml(city) + "</p>" : "") +
+        '<button id="open-app-btn" class="open-btn" type="button">Abrir en la app</button>' +
+        '<div id="fallback-message" class="fallback-message" hidden></div>' +
+        '<p class="beta-notice" id="beta-notice">Conectar Perros todavía está en fase de prueba.</p>';
+
+      var btn = document.getElementById("open-app-btn");
+      var fallbackEl = document.getElementById("fallback-message");
+
+      btn.addEventListener("click", function () {
+        var timer = setTimeout(function () {
+          document.removeEventListener("visibilitychange", onVisibilityChange);
+          fallbackEl.textContent =
+            "Parece que no tenés la app instalada. Conectar Perros todavía está en fase de prueba, así que puede que aún no la hayas descargado.";
+          fallbackEl.hidden = false;
+        }, 1500);
+
+        function onVisibilityChange() {
+          if (document.hidden) {
+            // El navegador logró pasar a la app: no hay nada que mostrar,
+            // el usuario ya se fue de esta página.
+            clearTimeout(timer);
+            document.removeEventListener("visibilitychange", onVisibilityChange);
+          }
+        }
+        document.addEventListener("visibilitychange", onVisibilityChange);
+
+        window.location.href = deepLink;
+      });
     }
 
-    function renderDog(dog, dogId) {
-      const avatarHtml = dog.avatar_url
-        ? `<img class="avatar" src="${escapeHtml(dog.avatar_url)}" alt="${escapeHtml(dog.name)}" />`
-        : `<div class="avatar-placeholder">🐕</div>`;
-      const cityLine = dog.city ? `<p class="muted">${escapeHtml(dog.city)}</p>` : "";
-      renderCard(`
-        ${avatarHtml}
-        <h1>${escapeHtml(dog.name)}</h1>
-        ${cityLine}
-        <p class="lead">Este perro está registrado en <strong>Conectar Perros</strong> 🐾<br/>Si lo encontraste, contactá a sus dueños desde la app.</p>
-        <a class="btn" id="open-app-btn" href="conectarperros://dog/${encodeURIComponent(dogId)}">Abrir en la app</a>
-        <p class="note">¿No tenés la app instalada? Todavía está en fase de prueba — muy pronto vas a poder descargarla desde Google Play y App Store.</p>
-      `);
-    }
-
-    async function main() {
-      const dogId = qs("id");
+    function loadDogCard() {
       if (!dogId) {
-        renderNotFound();
+        renderError("Falta el identificador del perro en el link.");
         return;
       }
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_public_dog_card`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({ dog_id: dogId }),
+
+      fetch(SUPABASE_URL + "/rest/v1/rpc/get_public_dog_card", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: "Bearer " + SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ dog_id: dogId }),
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error("request failed: " + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          var card = Array.isArray(data) ? data[0] : data;
+          if (!card) {
+            renderError("No encontramos este perro.");
+            return;
+          }
+          render(card);
+        })
+        .catch(function () {
+          renderError("No pudimos cargar los datos del perro. Probá de nuevo más tarde.");
         });
-        if (!res.ok) throw new Error("request failed");
-        const rows = await res.json();
-        const dog = Array.isArray(rows) ? rows[0] : rows;
-        if (!dog || !dog.name) {
-          renderNotFound();
-          return;
-        }
-        renderDog(dog, dogId);
-      } catch (e) {
-        renderNotFound();
-      }
     }
 
-    main();
+    loadDogCard();
   </script>
 </body>
 </html>
